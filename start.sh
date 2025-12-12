@@ -27,8 +27,9 @@ CPU_COUNT=$(nproc)
 WORKERS=$((2 * CPU_COUNT + 1))
 echo "CPU count: $CPU_COUNT, Gunicorn workers: $WORKERS"
 
-# If local/dev mode (USE_SQLITE=True or SKIP_NGINX=True), run gunicorn only on 8000
-if [ "${USE_SQLITE}" = "True" ] || [ "${USE_SQLITE}" = "true" ] || [ "${SKIP_NGINX}" = "True" ] || [ "${SKIP_NGINX}" = "true" ]; then
+# If SKIP_NGINX=True (local dev only), run gunicorn only on 8000
+# Note: USE_SQLITE alone should NOT skip nginx - SQLite can run in production with nginx
+if [ "${SKIP_NGINX}" = "True" ] || [ "${SKIP_NGINX}" = "true" ]; then
     echo "Starting gunicorn only (dev mode - no nginx)..."
     exec gunicorn --bind 0.0.0.0:8000 --workers $WORKERS musicmatch.wsgi:application
 fi
