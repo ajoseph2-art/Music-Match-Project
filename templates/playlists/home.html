@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4 mb-4">Welcome back, {{ user.username }}!</h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Your Communities -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3><i class="bi bi-people"></i> Your Communities</h3>
+            </div>
+            <div class="card-body">
+                {% if user_communities %}
+                <div class="list-group">
+                    {% for community in user_communities %}
+                    <a href="{% url 'community_detail' community.id %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ community.name }}</h5>
+                            <small>{{ community.member_count }} members</small>
+                        </div>
+                        <p class="mb-1">{{ community.description|truncatewords:15 }}</p>
+                        {% if community.genre %}
+                        <small class="badge bg-secondary">{{ community.genre }}</small>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">You're not part of any communities yet. <a href="{% url 'explore' %}">Explore communities</a> to get started!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Listening Parties -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3><i class="bi bi-calendar-event"></i> Upcoming Listening Parties</h3>
+            </div>
+            <div class="card-body">
+                {% if upcoming_parties %}
+                <div class="list-group">
+                    {% for party in upcoming_parties %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ party.name }}</h5>
+                            <small>{{ party.start_time|date:"M d, H:i" }}</small>
+                        </div>
+                        <p class="mb-1">{{ party.community.name }}</p>
+                        <small>Hosted by {{ party.host.username }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No upcoming listening parties.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Playlists -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3><i class="bi bi-music-note-list"></i> Recent Community Playlists</h3>
+            </div>
+            <div class="card-body">
+                {% if recent_playlists %}
+                <div class="list-group">
+                    {% for playlist in recent_playlists %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ playlist.name }}</h5>
+                            <small>{{ playlist.song_count }} songs</small>
+                        </div>
+                        <p class="mb-1">{{ playlist.description|truncatewords:10 }}</p>
+                        <small>From {{ playlist.community.name }} • Updated {{ playlist.updated_at|timesince }} ago</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No recent playlists from your communities.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Playlists -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h3><i class="bi bi-collection"></i> Your Playlists</h3>
+            </div>
+            <div class="card-body">
+                {% if user_playlists %}
+                <div class="list-group">
+                    {% for playlist in user_playlists %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ playlist.name }}</h5>
+                            <small>{{ playlist.song_count }} songs</small>
+                        </div>
+                        <p class="mb-1">{{ playlist.description|truncatewords:10 }}</p>
+                        <small>Updated {{ playlist.updated_at|timesince }} ago</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">You haven't created any playlists yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'explore' %}" class="btn btn-primary btn-lg me-2">
+            <i class="bi bi-compass"></i> Explore Communities
+        </a>
+        <a href="{% url 'recommendations' %}" class="btn btn-success btn-lg me-2">
+            <i class="bi bi-stars"></i> Recommendations
+        </a>
+        <a href="{% url 'discovery_swipe' %}" class="btn btn-info btn-lg me-2">
+            <i class="bi bi-arrow-left-right"></i> Discovery Swipe
+        </a>
+        <a href="{% url 'music_matches' %}" class="btn btn-warning btn-lg me-2">
+            <i class="bi bi-heart"></i> Music Matches
+        </a>
+        <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-lg">
+            <i class="bi bi-person"></i> View Profile
+        </a>
+    </div>
+</div>
+{% endblock %}
+

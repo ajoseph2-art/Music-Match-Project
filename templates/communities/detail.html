@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ community.name }} - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-4">{{ community.name }}</h1>
+        {% if community.genre %}
+        <span class="badge bg-secondary fs-6">{{ community.genre }}</span>
+        {% endif %}
+        <p class="lead mt-3">{{ community.description }}</p>
+        <p class="text-muted">
+            <i class="bi bi-people"></i> {{ community.member_count }} members
+            {% if community.created_by %}
+            • Created by {{ community.created_by.username }}
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        {% if is_member %}
+        <a href="{% url 'leave_community' community.id %}" class="btn btn-danger">
+            <i class="bi bi-box-arrow-right"></i> Leave Community
+        </a>
+        {% else %}
+        <a href="{% url 'join_community' community.id %}" class="btn btn-success">
+            <i class="bi bi-box-arrow-in-right"></i> Join Community
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <!-- Playlists -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3><i class="bi bi-music-note-list"></i> Community Playlists</h3>
+            </div>
+            <div class="card-body">
+                {% if playlists %}
+                <div class="list-group">
+                    {% for playlist in playlists %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ playlist.name }}</h5>
+                            <span class="badge bg-primary">{{ playlist.song_count }} songs</span>
+                        </div>
+                        {% if playlist.description %}
+                        <p class="mb-1">{{ playlist.description|truncatewords:15 }}</p>
+                        {% endif %}
+                        <small>By {{ playlist.owner.username }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No playlists yet. Be the first to create one!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Listening Parties -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3><i class="bi bi-calendar-event"></i> Active Listening Parties</h3>
+            </div>
+            <div class="card-body">
+                {% if listening_parties %}
+                <div class="list-group">
+                    {% for party in listening_parties %}
+                    <div class="list-group-item">
+                        <h5 class="mb-1">{{ party.name }}</h5>
+                        {% if party.description %}
+                        <p class="mb-1">{{ party.description|truncatewords:15 }}</p>
+                        {% endif %}
+                        <small>Hosted by {{ party.host.username }} • Starts {{ party.start_time|date:"M d, H:i" }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No active listening parties at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Music Matches - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-4">Music Matches</h1>
+        <p class="lead">Discover users with similar music tastes</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3><i class="bi bi-heart"></i> Your Music Compatibility Scores</h3>
+            </div>
+            <div class="card-body">
+                {% if matches %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Compatibility Score</th>
+                                <th>Last Calculated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for match in matches %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'user_profile' match.other_user.id %}">
+                                        {{ match.other_user.username }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar {% if match.score >= 0.7 %}bg-success{% elif match.score >= 0.4 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ match.score|floatformat:0 }}%"
+                                             aria-valuenow="{{ match.score }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            {{ match.score|floatformat:1 }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ match.calculated_at|timesince }} ago</td>
+                                <td>
+                                    <a href="{% url 'calculate_match' match.other_user.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-arrow-clockwise"></i> Recalculate
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <h4>No matches yet</h4>
+                    <p>Start by exploring communities and connecting with other users. Compatibility scores are calculated based on shared playlists and music preferences.</p>
+                    <a href="{% url 'explore' %}" class="btn btn-primary">Explore Communities</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

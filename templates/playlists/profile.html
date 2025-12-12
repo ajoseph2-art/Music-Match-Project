@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.username }}'s Profile - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h2>{{ profile_user.username }}</h2>
+                {% if profile.favorite_genre %}
+                <p class="text-muted"><i class="bi bi-music-note"></i> Favorite Genre: {{ profile.favorite_genre }}</p>
+                {% endif %}
+                {% if profile.favorite_artist %}
+                <p class="text-muted"><i class="bi bi-person"></i> Favorite Artist: {{ profile.favorite_artist }}</p>
+                {% endif %}
+                {% if profile.bio %}
+                <p class="mt-3">{{ profile.bio }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Badges -->
+        {% if badges %}
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="bi bi-award"></i> Badges</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for user_badge in badges %}
+                    <div class="col-6 text-center mb-3">
+                        <div class="badge-icon" style="font-size: 3rem;">{{ user_badge.badge.icon }}</div>
+                        <p class="small mb-0">{{ user_badge.badge.name }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3><i class="bi bi-music-note-list"></i> Public Playlists</h3>
+            </div>
+            <div class="card-body">
+                {% if playlists %}
+                <div class="list-group">
+                    {% for playlist in playlists %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ playlist.name }}</h5>
+                            <span class="badge bg-primary">{{ playlist.song_count }} songs</span>
+                        </div>
+                        {% if playlist.description %}
+                        <p class="mb-1">{{ playlist.description|truncatewords:20 }}</p>
+                        {% endif %}
+                        {% if playlist.community %}
+                        <small class="text-muted">From {{ playlist.community.name }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No public playlists yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

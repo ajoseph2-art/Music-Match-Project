@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Communities - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-4">Explore Communities</h1>
+        <p class="lead">Discover music communities that match your interests</p>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" name="search" class="form-control" placeholder="Search communities..." value="{{ search_query }}">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="genre" class="form-control" placeholder="Filter by genre..." value="{{ genre }}">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Communities Grid -->
+<div class="row">
+    {% if communities %}
+    {% for community in communities %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ community.name }}</h5>
+                {% if community.genre %}
+                <span class="badge bg-secondary mb-2">{{ community.genre }}</span>
+                {% endif %}
+                <p class="card-text">{{ community.description|truncatewords:20 }}</p>
+                <p class="text-muted small">
+                    <i class="bi bi-people"></i> {{ community.member_count }} members
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'community_detail' community.id %}" class="btn btn-primary w-100">
+                    View Community
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h4>No communities found</h4>
+            <p>Try adjusting your search or filter criteria.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
