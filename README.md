@@ -1,181 +1,188 @@
 # MusicMatch - Social Music Discovery Platform
 
-A full-stack web application for social music discovery, community building, and personalized music recommendations.
+A full-stack web application for social music discovery, community building, and personalized music recommendations powered by the Spotify API.
 
 ## Features
 
-- **Community Groups**: Connect with music lovers who share your taste
-- **Listening Parties**: Join live listening rooms with community members
-- **Collaborative Playlists**: Create and contribute to community playlists
-- **Reviews & Ratings**: Share your thoughts on songs and albums
-- **Music Matching**: See compatibility scores with other users
-- **Smart Recommendations**: Get personalized recommendations based on activity mode and song attributes
+### 🎵 Spotify Integration
+- **Search Songs**: Search for any song or artist on Spotify
+- **Similar Songs**: Discover songs similar to your favorites
+- **Genre Recommendations**: Browse music by genre (Pop, Rock, Hip-Hop, etc.)
+- **Audio Previews**: Listen to 30-second previews directly in the app
+
+### 🎧 Playlist Management
+- **Create Playlists**: Build your own custom playlists
+- **Add Songs**: Add songs from Spotify search results to any playlist
+- **Remove Songs**: Remove songs from playlists you own
+- **Share to Communities**: Share your playlists with communities
+- **View Details**: See who added each song and when
+
+### 👥 Community Features
+- **Create Communities**: Build communities around genres or shared interests
+- **Real-Time Chat**: Discord-style messaging within communities
+- **Community Playlists**: View and contribute to shared playlists
+- **Join/Leave**: Easily manage your community memberships
+- **Delete Communities**: Creators can remove their communities
+
+### 👤 User Features
+- **User Profiles**: View your profile and activity
+- **Authentication**: Secure login/logout system
+- **Personalized Experience**: See your playlists and communities
 
 ## Technology Stack
 
 - **Backend**: Django 5.0.7, Python 3.11+
 - **Frontend**: Bootstrap 5.3, HTML5, CSS3, JavaScript
 - **Database**: PostgreSQL (production), SQLite (development)
+- **API**: Spotify Web API for music data
 - **Deployment**: Docker, nginx, gunicorn, Google Cloud Platform
-- **Other**: Requests library for external API calls
+- **Other**: Requests library for API calls, WhiteNoise for static files
+
+## Quick Start
+
+### Local Development
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/ajoseph2-art/Music-Match-Project.git
+cd Music-Match-Project
+```
+
+2. **Run the quick setup script:**
+```bash
+./quick_local_server.sh
+```
+
+3. **Or set up manually:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+export USE_SQLITE=True
+export SPOTIFY_CLIENT_ID="your_client_id"
+export SPOTIFY_CLIENT_SECRET="your_client_secret"
+python3 manage.py migrate
+python3 manage.py runserver
+```
+
+4. **Access the app:**
+Visit http://127.0.0.1:8000
+
+## Spotify API Setup
+
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Create a new app
+3. Get your Client ID and Client Secret
+4. Set environment variables:
+```bash
+export SPOTIFY_CLIENT_ID="your_client_id"
+export SPOTIFY_CLIENT_SECRET="your_client_secret"
+```
+
+See `SPOTIFY_SETUP.md` for detailed instructions.
+
+## Deployment
+
+### Google Cloud Platform
+
+1. **Build and push Docker image:**
+```bash
+./CLOUD_BUILD.sh
+```
+
+2. **Create a VM instance** in GCP Console:
+   - Region: `us-west1`
+   - Machine type: `e2-small`
+   - Boot disk: Container-Optimized OS
+   - Firewall: Allow HTTP traffic
+   - Use `vm_startup_script.sh` as startup script
+
+3. **Access your app** at the VM's external IP
+
+### Docker (Local)
+
+```bash
+docker-compose up --build
+```
+
+Visit http://localhost:8000
 
 ## Project Structure
 
 ```
-musicmatch/
+Music-Match-Project/
 ├── accounts/          # User authentication and profiles
-├── communities/       # Community groups and listening parties
-├── playlists/         # Playlists, songs, and reviews
-├── recommendations/   # Recommendation engine and modes
-├── musicmatch/        # Django project settings
+├── communities/       # Community groups and chat
+├── playlists/         # Playlist and song management
+├── recommendations/   # Spotify integration and recommendations
 ├── templates/         # HTML templates
-├── staticfiles/       # Collected static files
-└── media/            # User-uploaded media
+├── musicmatch/        # Django project settings
+├── staticfiles/       # Static files (CSS, JS, images)
+├── Dockerfile         # Docker image definition
+├── docker-compose.yml # Docker compose configuration
+├── requirements.txt   # Python dependencies
+└── manage.py          # Django management script
 ```
 
-## Models
+## API Endpoints
 
-The application includes the following models (beyond Django's built-in User model):
-
-1. **UserProfile** (accounts) - Extended user profile with music preferences
-2. **Badge** (accounts) - Badges earned by users
-3. **Community** (communities) - Music communities
-4. **ListeningParty** (communities) - Live listening rooms
-5. **MusicMatch** (communities) - Compatibility scores between users
-6. **Song** (playlists) - Song information from Spotify
-7. **Playlist** (playlists) - User and community playlists
-8. **Review** (playlists) - Reviews and ratings for songs
-9. **RecommendationMode** (recommendations) - Activity-based recommendation modes
-10. **UserRecommendation** (recommendations) - Stored recommendations
-
-## Setup Instructions
-
-### Local Development
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd "serverside final project"
-   ```
-
-2. **Create a virtual environment**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up environment variables**
-   ```bash
-   export USE_SQLITE=True  # Use SQLite for local development
-   export DEBUG=True
-   ```
-
-5. **Run migrations**
-   ```bash
-   python manage.py migrate
-   ```
-
-6. **Create a superuser**
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-7. **Run the development server**
-   ```bash
-   python manage.py runserver
-   ```
-
-### Docker Development
-
-1. **Build and run with Docker Compose**
-   ```bash
-   docker-compose up --build
-   ```
-
-2. **Run migrations**
-   ```bash
-   docker-compose exec web python manage.py migrate
-   ```
-
-3. **Create superuser**
-   ```bash
-   docker-compose exec web python manage.py createsuperuser
-   ```
-
-## Deployment to Google Cloud Platform
-
-### Prerequisites
-
-- Google Cloud Platform account
-- Domain name registered
-- Docker installed locally
-
-### Deployment Steps
-
-1. **Build Docker image**
-   ```bash
-   docker build -t gcr.io/[PROJECT-ID]/musicmatch:latest .
-   ```
-
-2. **Push to Google Container Registry**
-   ```bash
-   docker push gcr.io/[PROJECT-ID]/musicmatch:latest
-   ```
-
-3. **Set up PostgreSQL database in GCP**
-   - Create Cloud SQL PostgreSQL instance
-   - Note connection details
-
-4. **Deploy to Compute Engine**
-   - Create managed instance group with at least 2 instances
-   - Configure load balancer
-   - Set up SSL/HTTPS with your domain
-   - Configure environment variables for database connection
-
-5. **Configure environment variables**
-   - `DB_NAME`: PostgreSQL database name
-   - `DB_USER`: PostgreSQL user
-   - `DB_PASSWORD`: PostgreSQL password
-   - `DB_HOST`: Cloud SQL instance IP
-   - `DB_PORT`: 5432
-   - `SECRET_KEY`: Django secret key
-   - `DEBUG`: False (for production)
-   - `USE_SQLITE`: False
-
-## Endpoints
-
-- `/` - Home page
-- `/accounts/join/` - User registration
+### Public
+- `/` - Landing page
 - `/accounts/login/` - User login
-- `/accounts/logout/` - User logout
-- `/accounts/about/` - About page
-- `/explore/` - Explore communities
-- `/profile/` - User profile
-- `/server_info/` - Server and Django configuration info
-- `/admin/` - Django admin interface
+- `/accounts/join/` - User registration
 
-## Requirements
+### Authenticated
+- `/home/` - User dashboard
+- `/communities/explore/` - Browse communities
+- `/playlists/` - View your playlists
+- `/recommendations/` - Get music recommendations
+- `/recommendations/spotify/search/` - Search Spotify
+- `/profile/` - View your profile
 
-See `requirements.txt` for complete list of dependencies.
+## Environment Variables
 
-Key dependencies:
-- Django==5.0.7
-- requests==2.22.0
-- psycopg2-binary==2.9.9
-- gunicorn==21.2.0
-- whitenoise==6.6.0
+Required:
+- `SPOTIFY_CLIENT_ID` - Spotify API client ID
+- `SPOTIFY_CLIENT_SECRET` - Spotify API client secret
+
+Optional:
+- `USE_SQLITE=True` - Use SQLite instead of PostgreSQL
+- `DEBUG=False` - Disable debug mode in production
+- `SECRET_KEY` - Django secret key
+- `ALLOWED_HOSTS` - Comma-separated list of allowed hosts
+
+## Database Models
+
+- **User**: Built-in Django user model
+- **UserProfile**: Extended user information
+- **Community**: Music communities with chat
+- **CommunityMessage**: Chat messages within communities
+- **Playlist**: User-created playlists
+- **Song**: Song information from Spotify
+- **PlaylistSong**: Many-to-many relationship with ordering
+- **Review**: User reviews and ratings
+
+## Contributing
+
+This is a course project. For issues or suggestions, please contact the authors.
 
 ## Authors
 
-- Joey Lu
-- Aaron Joseph
+- **Joey Lu**
+- **Aaron Joseph**
 
 ## License
 
-This project is for educational purposes (CSCI 565 - Server-Side Web Development).
+This project was created for educational purposes as part of a server-side web development course.
 
+## Acknowledgments
+
+- Spotify Web API for music data
+- Bootstrap for UI components
+- Django community for the excellent framework
+- Google Cloud Platform for hosting
+
+---
+
+**Live Demo**: http://34.53.53.240  
+**Repository**: https://github.com/ajoseph2-art/Music-Match-Project
