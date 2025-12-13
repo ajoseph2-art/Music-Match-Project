@@ -22,7 +22,7 @@
 <div class="row mb-4">
     <div class="col-12">
         {% if is_member %}
-        <a href="{% url 'leave_community' community.id %}" class="btn btn-danger">
+        <a href="{% url 'leave_community' community.id %}" class="btn btn-warning">
             <i class="bi bi-box-arrow-right"></i> Leave Community
         </a>
         {% else %}
@@ -30,8 +30,65 @@
             <i class="bi bi-box-arrow-in-right"></i> Join Community
         </a>
         {% endif %}
+        
+        {% if community.created_by == user %}
+        <a href="{% url 'delete_community' community.id %}" class="btn btn-danger float-end">
+            <i class="bi bi-trash"></i> Delete Community
+        </a>
+        {% endif %}
     </div>
 </div>
+
+<!-- Chat Section (for members only) -->
+{% if is_member %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3><i class="bi bi-chat-dots"></i> Community Chat</h3>
+            </div>
+            <div class="card-body">
+                <!-- Messages -->
+                <div id="chat-messages" style="height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 15px; background-color: #f8f9fa;">
+                    {% if messages_list %}
+                        {% for msg in messages_list %}
+                        <div class="mb-3">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-shrink-0">
+                                    <span class="badge bg-primary rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        {{ msg.user.username|slice:":1"|upper }}
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <strong>{{ msg.user.username }}</strong>
+                                        <small class="text-muted">{{ msg.created_at|timesince }} ago</small>
+                                    </div>
+                                    <p class="mb-0">{{ msg.message }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">No messages yet. Be the first to say hello!</p>
+                    {% endif %}
+                </div>
+
+                <!-- Message Form -->
+                <form method="post" action="{% url 'send_message' community.id %}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="message" class="form-control" placeholder="Type your message..." required maxlength="1000" autofocus>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Send
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div class="row">
     <!-- Playlists -->

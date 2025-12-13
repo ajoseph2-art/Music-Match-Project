@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from django.db import OperationalError
 from .models import UserProfile
 
 
@@ -8,7 +9,12 @@ from .models import UserProfile
 def create_user_profile(sender, instance, created, **kwargs):
     """Automatically create UserProfile when a User is created"""
     if created:
-        UserProfile.objects.get_or_create(user=instance)
+        try:
+            UserProfile.objects.get_or_create(user=instance)
+        except OperationalError:
+            # Table doesn't exist yet - migrations haven't been run
+            # This will be created after migrations run
+            pass
 
 
 @receiver(post_save, sender=User)

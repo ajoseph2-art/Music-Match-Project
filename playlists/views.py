@@ -76,3 +76,93 @@ def profile_view(request, user_id=None):
         'badges': badges,
     }
     return render(request, 'playlists/profile.html', context)
+
+
+@login_required
+def create_playlist_view(request):
+    """Create a new playlist"""
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description', '')
+        is_public = request.POST.get('is_public') == 'on'
+        community_id = request.POST.get('community')
+        
+        if name:
+            playlist = Playlist.objects.create(
+                name=name,
+                description=description,
+                owner=request.user,
+                is_public=is_public
+            )
+            
+            # Link to community if specified
+            if community_id:
+                try:
+                    community = Community.objects.get(id=community_id)
+                    if request.user in community.members.all():
+                        playlist.community = community
+                        playlist.save()
+                except Community.DoesNotExist:
+                    pass
+            
+            messages.success(request, f'Playlist "{name}" created successfully!')
+            return redirect('playlist_detail', playlist_id=playlist.id)
+        else:
+            messages.error(request, 'Please provide a playlist name.')
+    
+    # Get user's communities for the dropdown
+    user_communities = request.user.communities.all()
+    
+    return render(request, 'playlists/create_playlist.html', {
+        'user_communities': user_communities
+    })
+
+
+@login_required
+def playlist_detail_view(request, playlist_id):
+    """View playlist details"""
+    playlist = get_object_or_404(Playlist, id=playlist_id)
+    
+    # Check if user can view this playlist
+    if not playlist.is_public and playlist.owner != request.user:
+        messages.error(request, "This playlist is private.")
+        return redirect('home')
+    
+    songs = playlist.songs.all()
+    is_owner = playlist.owner == request.user
+    
+    context = {
+        'playlist': playlist,
+        'songs': songs,
+        'is_owner': is_owner,
+    }
+    return render(request, 'playlists/playlist_detail.html', context)
+
+
+@login_required
+def my_playlists_view(request):
+    """View all user's playlists"""
+    playlists = Playlist.objects.filter(owner=request.user).order_by('-updated_at')
+    
+    context = {
+        'playlists': playlists,
+    }
+    return render(request, 'playlists/my_playlists.html', context)
+
+
+@login_required
+def delete_playlist_view(request, playlist_id):
+    """Delete a playlist"""
+    playlist = get_object_or_404(Playlist, id=playlist_id)
+    
+    if playlist.owner != request.user:
+        messages.error(request, "You can only delete your own playlists.")
+        return redirect('my_playlists')
+    
+    if request.method == 'POST':
+        name = playlist.name
+        playlist.delete()
+        messages.success(request, f'Playlist "{name}" deleted.')
+        return redirect('my_playlists')
+    
+    return render(request, 'playlists/delete_playlist.html', {'playlist': playlist})

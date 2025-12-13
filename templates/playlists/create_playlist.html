@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Playlist - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0"><i class="bi bi-music-note-list"></i> Create a New Playlist</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Playlist Name*</label>
+                        <input type="text" name="name" class="form-control" id="name" required maxlength="255" 
+                               placeholder="e.g., Summer Vibes, Workout Mix">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea name="description" class="form-control" id="description" rows="3"
+                                  placeholder="Describe your playlist..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="community" class="form-label">Link to Community (Optional)</label>
+                        <select name="community" class="form-select" id="community">
+                            <option value="">Personal Playlist</option>
+                            {% for community in user_communities %}
+                            <option value="{{ community.id }}">{{ community.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">Link this playlist to a community you're a member of</small>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="is_public" class="form-check-input" id="is_public" checked>
+                        <label class="form-check-label" for="is_public">
+                            Make this playlist public
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Create Playlist</button>
+                    <a href="{% url 'my_playlists' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

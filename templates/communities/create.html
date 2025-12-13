@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Community - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0"><i class="bi bi-plus-circle"></i> Create a New Community</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Community Name*</label>
+                        <input type="text" name="name" class="form-control" id="name" required maxlength="255" 
+                               placeholder="e.g., Rock Lovers, Jazz Enthusiasts">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description*</label>
+                        <textarea name="description" class="form-control" id="description" rows="4" required
+                                  placeholder="Describe your community and what kind of music you'll discuss..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="genre" class="form-label">Primary Genre</label>
+                        <input type="text" name="genre" class="form-control" id="genre" maxlength="100"
+                               placeholder="e.g., Rock, Pop, Jazz, Hip-Hop">
+                        <small class="form-text text-muted">Optional - helps others find your community</small>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="is_public" class="form-check-input" id="is_public" checked>
+                        <label class="form-check-label" for="is_public">
+                            Make this community public (anyone can find and join)
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Create Community</button>
+                    <a href="{% url 'explore' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

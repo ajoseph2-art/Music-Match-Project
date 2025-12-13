@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Similar to {{ track_name }} - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-4"><i class="bi bi-music-note-list"></i> Similar Songs</h1>
+        <p class="lead">Songs similar to "{{ track_name }}"</p>
+    </div>
+</div>
+
+{% if original_track %}
+<!-- Original Track -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-dark text-white">
+            <div class="row g-0">
+                {% if original_track.album.images.0.url %}
+                <div class="col-md-2">
+                    <img src="{{ original_track.album.images.0.url }}" class="img-fluid rounded-start" alt="{{ original_track.name }}">
+                </div>
+                {% endif %}
+                <div class="col-md-10">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ original_track.name }}</h4>
+                        <p class="card-text">
+                            <strong>Artist:</strong> 
+                            {% for artist in original_track.artists %}
+                                {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p class="card-text"><strong>Album:</strong> {{ original_track.album.name }}</p>
+                        {% if original_track.preview_url %}
+                        <audio controls class="mt-2" style="height: 30px;">
+                            <source src="{{ original_track.preview_url }}" type="audio/mpeg">
+                        </audio>
+                        {% endif %}
+                        <a href="{{ original_track.external_urls.spotify }}" target="_blank" class="btn btn-success btn-sm ms-2">
+                            <i class="bi bi-spotify"></i> Open in Spotify
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Similar Songs -->
+<div class="row mb-3">
+    <div class="col-12">
+        <h3><i class="bi bi-arrow-down"></i> More from this artist</h3>
+    </div>
+</div>
+
+<div class="row">
+    {% if similar_tracks %}
+        {% for track in similar_tracks %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if track.album.images.0.url %}
+                <img src="{{ track.album.images.0.url }}" class="card-img-top" alt="{{ track.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ track.name }}</h5>
+                    <p class="card-text">
+                        <strong>Artist:</strong> 
+                        {% for artist in track.artists %}
+                            {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p class="card-text">
+                        <strong>Album:</strong> {{ track.album.name }}
+                    </p>
+                    {% if track.preview_url %}
+                    <audio controls class="w-100 mb-2">
+                        <source src="{{ track.preview_url }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex gap-2">
+                        <a href="{{ track.external_urls.spotify }}" target="_blank" class="btn btn-success btn-sm flex-grow-1">
+                            <i class="bi bi-spotify"></i> Spotify
+                        </a>
+                        <a href="{% url 'spotify_similar' %}?track_id={{ track.id }}&track_name={{ track.name|urlencode }}" class="btn btn-primary btn-sm flex-grow-1">
+                            <i class="bi bi-music-note-list"></i> Similar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4>No similar songs found</h4>
+                <p>Try searching for a different song.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{% url 'spotify_search' %}" class="btn btn-primary">
+            <i class="bi bi-search"></i> Search for Songs
+        </a>
+        <a href="{% url 'spotify_recommendations' %}" class="btn btn-secondary">
+            <i class="bi bi-music-note-beamed"></i> Browse by Genre
+        </a>
+    </div>
+</div>
+{% endblock %}
+

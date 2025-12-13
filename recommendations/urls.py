@@ -2,8 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.recommendations_view, name='recommendations'),
-    path('discovery/', views.discovery_swipe_view, name='discovery_swipe'),
-    path('swipe/<int:song_id>/<str:action>/', views.swipe_action_view, name='swipe_action'),
+    path('', views.spotify_recommendations_view, name='recommendations'),
+    path('spotify/', views.spotify_recommendations_view, name='spotify_recommendations'),
+    path('spotify/search/', views.search_spotify_view, name='spotify_search'),
+    path('spotify/similar/', views.spotify_similar_view, name='spotify_similar'),
 ]
 

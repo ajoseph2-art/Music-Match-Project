@@ -1,77 +1,67 @@
 {% extends 'base.html' %}
 
-{% block title %}Recommendations - MusicMatch{% endblock %}
+{% block title %}Music Discovery - MusicMatch{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h1 class="display-4">Music Recommendations</h1>
-        <p class="lead">Get personalized recommendations based on your activity and preferences</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-4"><i class="bi bi-spotify" style="color: #1DB954;"></i> Music Discovery</h1>
+                <p class="lead">Discover music powered by Spotify</p>
+            </div>
+            <div>
+                <a href="{% url 'spotify_search' %}" class="btn btn-success btn-lg">
+                    <i class="bi bi-search"></i> Search Songs
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Filters -->
+<!-- Genre Filter -->
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h3><i class="bi bi-sliders"></i> Filter Recommendations</h3>
+            <div class="card-header bg-dark text-white">
+                <h3 class="mb-0"><i class="bi bi-sliders"></i> Browse by Genre</h3>
             </div>
             <div class="card-body">
                 <form method="get" class="row g-3">
-                    <!-- Activity Mode -->
-                    <div class="col-md-4">
-                        <label for="mode" class="form-label">Activity Mode</label>
-                        <select name="mode" id="mode" class="form-select">
-                            <option value="">All Modes</option>
-                            {% for mode in modes %}
-                            <option value="{{ mode.id }}" {% if selected_mode.id == mode.id %}selected{% endif %}>
-                                {{ mode.get_name_display }}
-                            </option>
-                            {% endfor %}
+                    <div class="col-md-6">
+                        <label class="form-label">Select Genre</label>
+                        <select name="genre" class="form-select form-select-lg">
+                            <option value="pop" {% if genre == 'pop' %}selected{% endif %}>Pop</option>
+                            <option value="rock" {% if genre == 'rock' %}selected{% endif %}>Rock</option>
+                            <option value="hip-hop" {% if genre == 'hip-hop' %}selected{% endif %}>Hip-Hop</option>
+                            <option value="electronic" {% if genre == 'electronic' %}selected{% endif %}>Electronic</option>
+                            <option value="jazz" {% if genre == 'jazz' %}selected{% endif %}>Jazz</option>
+                            <option value="classical" {% if genre == 'classical' %}selected{% endif %}>Classical</option>
+                            <option value="country" {% if genre == 'country' %}selected{% endif %}>Country</option>
+                            <option value="r&b" {% if genre == 'r&b' %}selected{% endif %}>R&B</option>
+                            <option value="indie" {% if genre == 'indie' %}selected{% endif %}>Indie</option>
+                            <option value="metal" {% if genre == 'metal' %}selected{% endif %}>Metal</option>
+                            <option value="punk" {% if genre == 'punk' %}selected{% endif %}>Punk</option>
+                            <option value="blues" {% if genre == 'blues' %}selected{% endif %}>Blues</option>
+                            <option value="reggae" {% if genre == 'reggae' %}selected{% endif %}>Reggae</option>
+                            <option value="folk" {% if genre == 'folk' %}selected{% endif %}>Folk</option>
+                            <option value="edm" {% if genre == 'edm' %}selected{% endif %}>EDM</option>
+                            <option value="latin" {% if genre == 'latin' %}selected{% endif %}>Latin</option>
+                            <option value="k-pop" {% if genre == 'k-pop' %}selected{% endif %}>K-Pop</option>
+                            <option value="reggaeton" {% if genre == 'reggaeton' %}selected{% endif %}>Reggaeton</option>
+                            <option value="afrobeat" {% if genre == 'afrobeat' %}selected{% endif %}>Afrobeat</option>
+                            <option value="soul" {% if genre == 'soul' %}selected{% endif %}>Soul</option>
+                            <option value="funk" {% if genre == 'funk' %}selected{% endif %}>Funk</option>
                         </select>
                     </div>
-                    
-                    <!-- Genre -->
                     <div class="col-md-4">
-                        <label for="genre" class="form-label">Genre</label>
-                        <input type="text" name="genre" id="genre" class="form-control" placeholder="e.g., Rock, Pop" value="{{ genre }}">
+                        <label class="form-label">Year (optional)</label>
+                        <input type="text" name="year" class="form-control form-control-lg" placeholder="e.g., 2023 or 2020-2024">
                     </div>
-                    
-                    <!-- Danceability -->
-                    <div class="col-md-2">
-                        <label for="min_danceability" class="form-label">Min Danceability</label>
-                        <input type="number" name="min_danceability" id="min_danceability" class="form-control" 
-                               min="0" max="1" step="0.1" placeholder="0.0" value="{{ min_danceability }}">
-                    </div>
-                    
-                    <div class="col-md-2">
-                        <label for="max_danceability" class="form-label">Max Danceability</label>
-                        <input type="number" name="max_danceability" id="max_danceability" class="form-control" 
-                               min="0" max="1" step="0.1" placeholder="1.0" value="{{ max_danceability }}">
-                    </div>
-                    
-                    <!-- Energy -->
-                    <div class="col-md-2">
-                        <label for="min_energy" class="form-label">Min Energy</label>
-                        <input type="number" name="min_energy" id="min_energy" class="form-control" 
-                               min="0" max="1" step="0.1" placeholder="0.0" value="{{ min_energy }}">
-                    </div>
-                    
-                    <div class="col-md-2">
-                        <label for="max_energy" class="form-label">Max Energy</label>
-                        <input type="number" name="max_energy" id="max_energy" class="form-control" 
-                               min="0" max="1" step="0.1" placeholder="1.0" value="{{ max_energy }}">
-                    </div>
-                    
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-search"></i> Get Recommendations
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-music-note-beamed"></i> Find
                         </button>
-                        <a href="{% url 'recommendations' %}" class="btn btn-outline-secondary">Clear Filters</a>
-                        <a href="{% url 'discovery_swipe' %}" class="btn btn-success float-end">
-                            <i class="bi bi-arrow-left-right"></i> Discovery Swipe Mode
-                        </a>
                     </div>
                 </form>
             </div>
@@ -79,63 +69,58 @@
     </div>
 </div>
 
-<!-- Recommendations -->
+<!-- Results -->
 <div class="row">
-    {% if songs %}
-    {% for song in songs %}
-    <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">{{ song.name }}</h5>
-                <p class="card-text text-muted">by <strong>{{ song.artist }}</strong></p>
-                {% if song.album %}
-                <p class="card-text small"><em>{{ song.album }}</em></p>
+    {% if spotify_tracks %}
+        <div class="col-12 mb-3">
+            <h3><i class="bi bi-music-note-list"></i> {{ genre|title }} Music</h3>
+        </div>
+        {% for track in spotify_tracks %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if track.album.images.0.url %}
+                <img src="{{ track.album.images.0.url }}" class="card-img-top" alt="{{ track.name }}">
                 {% endif %}
-                
-                {% if song.genre %}
-                <span class="badge bg-secondary mb-2">{{ song.genre }}</span>
-                {% endif %}
-                
-                <div class="mt-3">
-                    {% if song.danceability is not None %}
-                    <div class="mb-2">
-                        <small class="text-muted">Danceability:</small>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar" role="progressbar" style="width: {{ song.danceability|floatformat:0 }}%"></div>
-                        </div>
-                        <small>{{ song.danceability|floatformat:2 }}</small>
-                    </div>
-                    {% endif %}
-                    
-                    {% if song.energy is not None %}
-                    <div class="mb-2">
-                        <small class="text-muted">Energy:</small>
-                        <div class="progress" style="height: 10px;">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ song.energy|floatformat:0 }}%"></div>
-                        </div>
-                        <small>{{ song.energy|floatformat:2 }}</small>
-                    </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ track.name }}</h5>
+                    <p class="card-text">
+                        <strong>Artist:</strong> 
+                        {% for artist in track.artists %}
+                            {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p class="card-text">
+                        <strong>Album:</strong> {{ track.album.name }}
+                    </p>
+                    {% if track.preview_url %}
+                    <audio controls class="w-100 mb-2">
+                        <source src="{{ track.preview_url }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
                     {% endif %}
                 </div>
-            </div>
-            <div class="card-footer">
-                {% if song.spotify_url %}
-                <a href="{{ song.spotify_url }}" target="_blank" class="btn btn-sm btn-success">
-                    <i class="bi bi-spotify"></i> Open in Spotify
-                </a>
-                {% endif %}
+                <div class="card-footer">
+                    <div class="d-flex gap-2">
+                        <a href="{{ track.external_urls.spotify }}" target="_blank" class="btn btn-success btn-sm flex-grow-1">
+                            <i class="bi bi-spotify"></i> Spotify
+                        </a>
+                        <a href="{% url 'spotify_similar' %}?track_id={{ track.id }}&track_name={{ track.name|urlencode }}" class="btn btn-primary btn-sm flex-grow-1">
+                            <i class="bi bi-music-note-list"></i> Similar
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
     {% else %}
-    <div class="col-12">
-        <div class="alert alert-info">
-            <h4>No recommendations found</h4>
-            <p>Try adjusting your filters or check back later when more songs are added to the database.</p>
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4><i class="bi bi-info-circle"></i> Select a genre to get started</h4>
+                <p>Choose a genre from the dropdown above and click "Find" to discover music!</p>
+                <hr>
+                <p class="mb-0">Or <a href="{% url 'spotify_search' %}">search for specific songs</a> directly.</p>
+            </div>
         </div>
-    </div>
     {% endif %}
 </div>
 {% endblock %}
-

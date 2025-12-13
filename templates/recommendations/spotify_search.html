@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Spotify - MusicMatch{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="display-4"><i class="bi bi-search"></i> Search Spotify</h1>
+        <p class="lead">Find any song on Spotify</p>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="q" class="form-control" placeholder="Search for songs, artists, albums..." value="{{ query }}" required autofocus>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Results -->
+<div class="row">
+    {% if results %}
+        {% for track in results %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                {% if track.album.images.0.url %}
+                <img src="{{ track.album.images.0.url }}" class="card-img-top" alt="{{ track.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ track.name }}</h5>
+                    <p class="card-text">
+                        <strong>Artist:</strong> 
+                        {% for artist in track.artists %}
+                            {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p class="card-text">
+                        <strong>Album:</strong> {{ track.album.name }}
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            {% if track.explicit %}<span class="badge bg-warning">Explicit</span>{% endif %}
+                        </small>
+                    </p>
+                    {% if track.preview_url %}
+                    <audio controls class="w-100 mb-2">
+                        <source src="{{ track.preview_url }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex gap-2">
+                        <a href="{{ track.external_urls.spotify }}" target="_blank" class="btn btn-success btn-sm flex-grow-1">
+                            <i class="bi bi-spotify"></i> Spotify
+                        </a>
+                        <a href="{% url 'spotify_similar' %}?track_id={{ track.id }}&track_name={{ track.name|urlencode }}" class="btn btn-primary btn-sm flex-grow-1">
+                            <i class="bi bi-music-note-list"></i> Similar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        {% if query %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4>No results found for "{{ query }}"</h4>
+                <p>Try different search terms or check your spelling.</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-secondary">
+                <h4>Start searching</h4>
+                <p>Enter a song name, artist, or album in the search box above.</p>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <a href="{% url 'spotify_recommendations' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> Browse by Genre
+        </a>
+    </div>
+</div>
+{% endblock %}
+

@@ -49,3 +49,18 @@ class MusicMatch(models.Model):
     def __str__(self):
         return f"{self.user1.username} & {self.user2.username}: {self.compatibility_score:.2%}"
 
+
+class CommunityMessage(models.Model):
+    """Chat messages within a community"""
+    community = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='messages')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='community_messages')
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"{self.user.username} in {self.community.name}: {self.message[:50]}"
+
