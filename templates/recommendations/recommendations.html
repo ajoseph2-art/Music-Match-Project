@@ -100,7 +100,7 @@
                     {% endif %}
                 </div>
                 <div class="card-footer">
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 mb-2">
                         <a href="{{ track.external_urls.spotify }}" target="_blank" class="btn btn-success btn-sm flex-grow-1">
                             <i class="bi bi-spotify"></i> Spotify
                         </a>
@@ -108,6 +108,36 @@
                             <i class="bi bi-music-note-list"></i> Similar
                         </a>
                     </div>
+                    
+                    {% if user_playlists %}
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary btn-sm w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-plus-circle"></i> Add to Playlist
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            {% for playlist in user_playlists %}
+                            <li>
+                                <form method="post" action="{% url 'add_song_to_playlist' playlist.id %}" class="dropdown-item-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="spotify_id" value="{{ track.id }}">
+                                    <input type="hidden" name="name" value="{{ track.name }}">
+                                    <input type="hidden" name="artist" value="{% for artist in track.artists %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                                    <input type="hidden" name="album" value="{{ track.album.name }}">
+                                    <input type="hidden" name="duration_ms" value="{{ track.duration_ms }}">
+                                    <input type="hidden" name="image_url" value="{% if track.album.images %}{{ track.album.images.0.url }}{% endif %}">
+                                    <input type="hidden" name="spotify_url" value="{{ track.external_urls.spotify }}">
+                                    <input type="hidden" name="next" value="{% url 'recommendations' %}?genre={{ genre }}">
+                                    <button type="submit" class="dropdown-item">{{ playlist.name }}</button>
+                                </form>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'create_playlist' %}" class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="bi bi-plus-circle"></i> Create Playlist First
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

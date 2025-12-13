@@ -79,6 +79,9 @@ def spotify_recommendations_view(request):
         "market": "US"
     }
     
+    from playlists.models import Playlist
+    user_playlists = Playlist.objects.filter(owner=request.user).order_by('-updated_at')
+    
     try:
         response = requests.get(url, headers=headers, params=params, timeout=10)
         if response.status_code == 200:
@@ -89,6 +92,7 @@ def spotify_recommendations_view(request):
                 'spotify_tracks': spotify_tracks,
                 'genre': genre,
                 'valid_genres': valid_genres,
+                'user_playlists': user_playlists,
             }
             return render(request, 'recommendations/recommendations.html', context)
         else:
@@ -97,21 +101,35 @@ def spotify_recommendations_view(request):
         messages.error(request, f"Error connecting to Spotify: {str(e)}")
     
     # Return empty page on error instead of redirect loop
-    return render(request, 'recommendations/recommendations.html', {'spotify_tracks': [], 'genre': genre})
+    return render(request, 'recommendations/recommendations.html', {
+        'spotify_tracks': [],
+        'genre': genre,
+        'user_playlists': user_playlists
+    })
 
 
 @login_required
 def search_spotify_view(request):
     """Search for songs on Spotify"""
+    from playlists.models import Playlist
+    
     query = request.GET.get('q', '')
     token = get_spotify_token()
+    user_playlists = Playlist.objects.filter(owner=request.user).order_by('-updated_at')
     
     if not token:
         messages.warning(request, "Spotify API not configured.")
-        return render(request, 'recommendations/spotify_search.html', {'results': [], 'error': 'Spotify not configured'})
+        return render(request, 'recommendations/spotify_search.html', {
+            'results': [],
+            'error': 'Spotify not configured',
+            'user_playlists': user_playlists
+        })
     
     if not query:
-        return render(request, 'recommendations/spotify_search.html', {'results': []})
+        return render(request, 'recommendations/spotify_search.html', {
+            'results': [],
+            'user_playlists': user_playlists
+        })
     
     # Search Spotify
     url = "https://api.spotify.com/v1/search"
@@ -132,12 +150,16 @@ def search_spotify_view(request):
             context = {
                 'results': tracks,
                 'query': query,
+                'user_playlists': user_playlists,
             }
             return render(request, 'recommendations/spotify_search.html', context)
     except Exception as e:
         messages.error(request, f"Error searching Spotify: {str(e)}")
     
-    return render(request, 'recommendations/spotify_search.html', {'results': []})
+    return render(request, 'recommendations/spotify_search.html', {
+        'results': [],
+        'user_playlists': user_playlists
+    })
 
 
 @login_required
@@ -187,10 +209,14 @@ def spotify_similar_view(request):
                 # Filter out the original track
                 similar_tracks = [t for t in all_tracks if t['id'] != track_id]
         
+        from playlists.models import Playlist
+        user_playlists = Playlist.objects.filter(owner=request.user).order_by('-updated_at')
+        
         context = {
             'original_track': original_track,
             'similar_tracks': similar_tracks,
             'track_name': track_name or (original_track['name'] if original_track else 'Unknown'),
+            'user_playlists': user_playlists,
         }
         return render(request, 'recommendations/spotify_similar.html', context)
         

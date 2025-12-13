@@ -35,10 +35,10 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h3><i class="bi bi-music-note-beamed"></i> Songs ({{ songs.count }})</h3>
+                <h3><i class="bi bi-music-note-beamed"></i> Songs ({{ playlist_songs.count }})</h3>
             </div>
             <div class="card-body">
-                {% if songs %}
+                {% if playlist_songs %}
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
@@ -47,26 +47,38 @@
                                 <th>Title</th>
                                 <th>Artist</th>
                                 <th>Album</th>
+                                <th>Added By</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for song in songs %}
+                            {% for ps in playlist_songs %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
                                 <td>
-                                    {% if song.image_url %}
-                                    <img src="{{ song.image_url }}" alt="" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+                                    {% if ps.song.image_url %}
+                                    <img src="{{ ps.song.image_url }}" alt="" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
                                     {% endif %}
-                                    {{ song.name }}
+                                    {{ ps.song.name }}
                                 </td>
-                                <td>{{ song.artist }}</td>
-                                <td>{{ song.album|default:"-" }}</td>
+                                <td>{{ ps.song.artist }}</td>
+                                <td>{{ ps.song.album|default:"-" }}</td>
                                 <td>
-                                    {% if song.spotify_url %}
-                                    <a href="{{ song.spotify_url }}" target="_blank" class="btn btn-sm btn-success">
+                                    <small class="text-muted">{{ ps.added_by.username }}</small>
+                                </td>
+                                <td>
+                                    {% if ps.song.spotify_url %}
+                                    <a href="{{ ps.song.spotify_url }}" target="_blank" class="btn btn-sm btn-success">
                                         <i class="bi bi-spotify"></i>
                                     </a>
+                                    {% endif %}
+                                    {% if can_edit %}
+                                    <form method="post" action="{% url 'remove_song_from_playlist' playlist.id ps.song.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove this song from the playlist?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                     {% endif %}
                                 </td>
                             </tr>

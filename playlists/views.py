@@ -128,13 +128,17 @@ def playlist_detail_view(request, playlist_id):
         messages.error(request, "This playlist is private.")
         return redirect('home')
     
-    songs = playlist.songs.all()
+    # Get songs with PlaylistSong info for ordering and metadata
+    from .models import PlaylistSong
+    playlist_songs = PlaylistSong.objects.filter(playlist=playlist).select_related('song', 'added_by')
     is_owner = playlist.owner == request.user
+    can_edit = is_owner or playlist.is_collaborative
     
     context = {
         'playlist': playlist,
-        'songs': songs,
+        'playlist_songs': playlist_songs,
         'is_owner': is_owner,
+        'can_edit': can_edit,
     }
     return render(request, 'playlists/playlist_detail.html', context)
 
@@ -166,3 +170,90 @@ def delete_playlist_view(request, playlist_id):
         return redirect('my_playlists')
     
     return render(request, 'playlists/delete_playlist.html', {'playlist': playlist})
+
+
+@login_required
+def add_song_to_playlist(request, playlist_id):
+    """Add a song to a playlist from Spotify"""
+    if request.method != 'POST':
+        return redirect('home')
+    
+    playlist = get_object_or_404(Playlist, id=playlist_id)
+    
+    # Check if user can add to this playlist
+    if playlist.owner != request.user and not playlist.is_collaborative:
+        messages.error(request, "You don't have permission to add songs to this playlist.")
+        return redirect('playlist_detail', playlist_id=playlist_id)
+    
+    # Get song data from POST
+    spotify_id = request.POST.get('spotify_id')
+    name = request.POST.get('name')
+    artist = request.POST.get('artist')
+    album = request.POST.get('album', '')
+    duration_ms = request.POST.get('duration_ms', 0)
+    image_url = request.POST.get('image_url', '')
+    spotify_url = request.POST.get('spotify_url', '')
+    
+    if not spotify_id or not name or not artist:
+        messages.error(request, "Missing song information.")
+        return redirect('playlist_detail', playlist_id=playlist_id)
+    
+    # Get or create the song
+    song, created = Song.objects.get_or_create(
+        spotify_id=spotify_id,
+        defaults={
+            'name': name,
+            'artist': artist,
+            'album': album,
+            'duration_ms': duration_ms,
+            'image_url': image_url,
+            'spotify_url': spotify_url,
+        }
+    )
+    
+    # Check if song is already in playlist
+    if playlist.songs.filter(id=song.id).exists():
+        messages.info(request, f'"{name}" is already in this playlist.')
+    else:
+        # Add song to playlist
+        from .models import PlaylistSong
+        max_order = playlist.playlistsong_set.count()
+        PlaylistSong.objects.create(
+            playlist=playlist,
+            song=song,
+            added_by=request.user,
+            order=max_order
+        )
+        messages.success(request, f'Added "{name}" to "{playlist.name}"!')
+    
+    # Redirect back to the page they came from
+    next_url = request.POST.get('next', 'playlist_detail')
+    if 'playlist_detail' in next_url or next_url == 'playlist_detail':
+        return redirect('playlist_detail', playlist_id=playlist_id)
+    return redirect(next_url)
+
+
+@login_required
+def remove_song_from_playlist(request, playlist_id, song_id):
+    """Remove a song from a playlist"""
+    if request.method != 'POST':
+        return redirect('playlist_detail', playlist_id=playlist_id)
+    
+    playlist = get_object_or_404(Playlist, id=playlist_id)
+    song = get_object_or_404(Song, id=song_id)
+    
+    # Check if user can remove from this playlist
+    if playlist.owner != request.user and not playlist.is_collaborative:
+        messages.error(request, "You don't have permission to remove songs from this playlist.")
+        return redirect('playlist_detail', playlist_id=playlist_id)
+    
+    # Remove the song
+    from .models import PlaylistSong
+    try:
+        playlist_song = PlaylistSong.objects.get(playlist=playlist, song=song)
+        playlist_song.delete()
+        messages.success(request, f'Removed "{song.name}" from "{playlist.name}".')
+    except PlaylistSong.DoesNotExist:
+        messages.error(request, "Song not found in playlist.")
+    
+    return redirect('playlist_detail', playlist_id=playlist_id)
