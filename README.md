@@ -1,3 +1,5 @@
+[![Build C++](https://github.com/ajoseph2-art/Music-Match-Project/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/ajoseph2-art/Music-Match-Project/actions/workflows/build.yml)
+
 # MusicMatch - Social Music Discovery Platform
 
 A full-stack web application for social music discovery, community building, and personalized music recommendations.
