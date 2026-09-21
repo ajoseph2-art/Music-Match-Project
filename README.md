@@ -1,4 +1,4 @@
-[![Build C++](https://github.com/ajoseph2-art/Music-Match-Project/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/ajoseph2-art/Music-Match-Project/actions/workflows/build.yml)
+[![Build C++](https://github.com/ajoseph2-art/Music-Match-Project/actions/workflows/actions.yml/badge.svg)](https://github.com/ajoseph2-art/Music-Match-Project/actions/workflows/actions.yml)
 
 # MusicMatch - Social Music Discovery Platform
 
