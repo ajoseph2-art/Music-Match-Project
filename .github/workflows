@@ -1,5 +1,3 @@
-[![Build C++](https://github.com/ajoseph2-art/Music-Match-Project/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/ajoseph2-art/Music-Match-Project/actions/workflows/build.yml)
-
 name: Build C++
 
 on:
